@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>¿Por qué dejaste de bajar? · Bastián Almaraz</title>
+<meta name="description" content="Descubre en 3 minutos qué puede estar frenando tu progreso y qué variable deberías revisar primero.">
+<meta name="theme-color" content="#0E0E0D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F2EE;
+  --paper:#FFFFFF;
+  --ink:#0E0E0D;
+  --ink-2:#3B3A37;
+  --muted:#7C7A74;
+  --line:#E2E0DA;
+  --dark:#0E0E0D;
+  --dark-2:#1A1917;
+  --gold:#C1863A;
+  --gold-soft:#F3E7D6;
+  --radius:14px;
+  --display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:"Inter", "Helvetica Neue", Arial, sans-serif;
+  --serif:"Instrument Serif", Georgia, serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;min-height:100dvh}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:inherit}
+
+/* ---------- Top bar ---------- */
+.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.top-inner{max-width:640px;margin:0 auto;padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-family:var(--display);font-stretch:112%;font-weight:800;letter-spacing:.14em;font-size:12px;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.brand i{width:7px;height:7px;background:var(--gold);display:inline-block;transform:rotate(45deg)}
+.step-count{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.progress{height:2px;background:var(--line);max-width:640px;margin:0 auto}
+.progress span{display:block;height:100%;width:0;background:var(--ink);transition:width .5s cubic-bezier(.2,.7,.2,1)}
+.top.hidden-bar .progress,.top.hidden-bar .step-count{visibility:hidden}
+
+/* ---------- Layout ---------- */
+main{max-width:640px;margin:0 auto;padding:28px 20px 64px}
+.screen{animation:enter .45s cubic-bezier(.2,.7,.2,1) both}
+@keyframes enter{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.screen.leaving{animation:leave .22s ease forwards}
+@keyframes leave{to{opacity:0;transform:translateY(-8px)}}
+
+.kicker{font-family:var(--display);font-stretch:110%;font-weight:700;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.kicker::before{content:"";width:22px;height:1px;background:currentColor}
+
+h1,h2,h3{font-family:var(--display);font-weight:900;line-height:.95;letter-spacing:-.01em}
+.q-title{font-family:var(--display);font-weight:800;font-stretch:96%;font-size:clamp(26px,6.6vw,36px);line-height:1.08;letter-spacing:-.015em;margin-bottom:10px;text-wrap:balance}
+.q-help{color:var(--muted);font-size:14.5px;margin-bottom:24px}
+
+/* ---------- Cover ---------- */
+.cover{min-height:calc(100dvh - 120px);display:flex;flex-direction:column;justify-content:center;padding:12px 0 24px}
+.cover-tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:7px 14px;align-self:flex-start;margin-bottom:28px}
+.cover-tag b{width:6px;height:6px;border-radius:50%;background:var(--gold);display:inline-block}
+.cover h1{font-stretch:78%;font-size:clamp(60px,17vw,112px);text-transform:uppercase;line-height:.86;letter-spacing:-.02em;margin-bottom:26px}
+.cover h1 em{font-style:normal;color:var(--gold)}
+.cover .sub{font-size:clamp(17px,4.4vw,20px);color:var(--ink-2);max-width:30ch;margin-bottom:34px;line-height:1.45}
+.cover .meta{display:flex;gap:22px;flex-wrap:wrap;margin-bottom:34px;color:var(--muted);font-size:13px}
+.cover .meta span{display:flex;align-items:center;gap:8px}
+.cover .meta svg{width:16px;height:16px;stroke:var(--ink);fill:none;stroke-width:1.6}
+.fineprint{font-size:13px;color:var(--muted);margin-top:16px}
+.signature{margin-top:auto;padding-top:40px;display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);margin-top:48px}
+.mono{width:44px;height:44px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:var(--display);font-weight:800;font-stretch:90%;font-size:15px;letter-spacing:.04em;flex:none}
+.signature p{font-size:13.5px;color:var(--ink-2);line-height:1.4}
+.signature p b{display:block;color:var(--ink);font-weight:600}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:12px;width:100%;min-height:58px;padding:0 26px;border-radius:999px;background:var(--ink);color:#fff;font-family:var(--display);font-stretch:112%;font-weight:800;font-size:14px;letter-spacing:.14em;text-transform:uppercase;transition:transform .18s ease,background .2s ease,opacity .2s;text-decoration:none}
+.btn:hover{background:#25241F}
+.btn:active{transform:scale(.98)}
+.btn svg{width:18px;height:18px;transition:transform .2s}
+.btn:hover svg{transform:translateX(3px)}
+.btn[disabled]{opacity:.28;pointer-events:none}
+.btn.gold{background:var(--gold);color:#140E05}
+.btn.gold:hover{background:#D0954A}
+.btn.light{background:#fff;color:var(--ink)}
+.back{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);padding:6px 0;margin-bottom:18px;transition:color .2s}
+.back:hover{color:var(--ink)}
+.back svg{width:14px;height:14px}
+
+/* ---------- Options ---------- */
+.options{display:grid;gap:10px}
+.opt{position:relative;display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:17px 18px;min-height:60px;font-size:15.5px;line-height:1.35;color:var(--ink);transition:border-color .2s,transform .15s,box-shadow .2s,background .2s}
+.opt:hover{border-color:#C9C6BE;box-shadow:0 6px 18px -12px rgba(0,0,0,.25)}
+.opt:active{transform:scale(.99)}
+.opt .mark{flex:none;width:22px;height:22px;border-radius:50%;border:1.5px solid #C9C6BE;display:grid;place-items:center;transition:all .2s}
+.opt.multi .mark{border-radius:6px}
+.opt .mark svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;opacity:0;transform:scale(.6);transition:all .2s}
+.opt[aria-pressed="true"]{border-color:var(--ink);background:#FCFBF8;box-shadow:inset 3px 0 0 var(--gold)}
+.opt[aria-pressed="true"] .mark{background:var(--ink);border-color:var(--ink)}
+.opt[aria-pressed="true"] .mark svg{opacity:1;transform:none}
+.opt .letter{font-family:var(--display);font-stretch:110%;font-weight:700;font-size:11px;color:var(--muted);letter-spacing:.1em;margin-left:auto;flex:none}
+.hint-multi{font-size:13px;color:var(--muted);margin:-10px 0 18px}
+
+.field-label{display:block;font-size:13px;color:var(--ink-2);font-weight:500;margin:22px 0 8px}
+.input,.textarea{width:100%;font:inherit;font-size:16px;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s}
+.textarea{min-height:84px;resize:vertical}
+.input:focus,.textarea:focus{border-color:var(--ink);box-shadow:0 0 0 4px rgba(193,134,58,.14)}
+.ig-wrap{position:relative}
+.ig-wrap span{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-weight:600;color:var(--muted);font-size:17px}
+.ig-wrap .input{padding-left:38px;font-size:17px;min-height:60px}
+.error{color:#A4401F;font-size:13px;margin-top:8px;min-height:18px}
+.actions{margin-top:26px}
+
+.group-title{font-family:var(--display);font-stretch:105%;font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);margin:26px 0 10px}
+.group-title:first-of-type{margin-top:6px}
+.chips{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.chips .opt{justify-content:center;text-align:center;padding:15px 10px;min-height:54px}
+.chips .opt .mark{display:none}
+
+/* ---------- IG gate ---------- */
+.gate-card{background:var(--dark);color:#fff;border-radius:20px;padding:30px 24px 26px;margin-bottom:22px;position:relative;overflow:hidden}
+.gate-card::after{content:"";position:absolute;right:-60px;top:-60px;width:180px;height:180px;border:1px solid rgba(193,134,58,.35);border-radius:50%}
+.gate-card .kicker{margin-bottom:12px}
+.gate-card h2{font-stretch:88%;font-size:clamp(30px,8vw,40px);text-transform:uppercase;line-height:.95;margin-bottom:12px}
+.gate-card p{color:#BDBAB2;font-size:14.5px;max-width:36ch}
+.privacy{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--muted);margin-top:14px;line-height:1.45}
+.privacy svg{flex:none;width:15px;height:15px;stroke:var(--muted);fill:none;stroke-width:1.7;margin-top:1px}
+
+/* ---------- Loader ---------- */
+.loader{min-height:60vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+.loader h2{font-stretch:88%;font-size:clamp(30px,8vw,44px);text-transform:uppercase;margin-bottom:22px}
+.loader ul{list-style:none;display:grid;gap:12px;width:100%}
+.loader li{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:15px;opacity:.35;transition:opacity .4s,color .4s}
+.loader li.on{opacity:1;color:var(--ink)}
+.loader li i{width:18px;height:18px;border-radius:50%;border:1.5px solid currentColor;flex:none;display:grid;place-items:center}
+.loader li.done i{background:var(--ink);border-color:var(--ink)}
+.loader li.done i::after{content:"";width:6px;height:3px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+
+/* ---------- Result ---------- */
+.result-hero{background:var(--dark);color:#fff;border-radius:22px;padding:30px 24px 28px;margin:0 -4px 28px;position:relative;overflow:hidden}
+.result-hero::before{content:"";position:absolute;inset:auto -40px -120px auto;width:260px;height:260px;border-radius:50%;background:radial-gradient(closest-side,rgba(193,134,58,.28),transparent)}
+.result-hero .handle{font-size:12.5px;color:#9C998F;margin-bottom:18px;letter-spacing:.03em}
+.result-hero .lead{font-size:16px;color:#D6D3CB;margin-bottom:16px;max-width:40ch;position:relative}
+.result-hero .lead b{color:#fff;font-weight:600}
+.result-hero h1{font-stretch:76%;font-size:clamp(52px,15vw,92px);text-transform:uppercase;line-height:.86;letter-spacing:-.015em;margin-bottom:18px;position:relative}
+.result-hero h1 em{font-style:normal;color:var(--gold)}
+.result-hero .headline{font-family:var(--serif);font-style:italic;font-size:clamp(21px,5.4vw,26px);line-height:1.25;color:#F1EEE6;position:relative;max-width:30ch}
+
+.block{padding:26px 0;border-top:1px solid var(--line)}
+.block:first-of-type{border-top:0;padding-top:4px}
+.block h3{font-stretch:100%;font-weight:800;font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.block h3 small{font-family:var(--body);font-weight:500;letter-spacing:0;text-transform:none;color:var(--muted);font-size:12px;margin-left:auto}
+.block p{color:var(--ink-2);margin-bottom:12px}
+.block p:last-child{margin-bottom:0}
+.block p strong{color:var(--ink);font-weight:600}
+
+.bars{display:grid;gap:12px}
+.bar{display:grid;grid-template-columns:118px 1fr;align-items:center;gap:12px;font-size:13.5px}
+.bar .lbl{color:var(--ink-2)}
+.bar .track{height:8px;background:#E7E5DF;border-radius:99px;overflow:hidden}
+.bar .fill{height:100%;width:0;background:#B7B3AA;border-radius:99px;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+.bar.top .lbl{color:var(--ink);font-weight:600}
+.bar.top .fill{background:var(--ink)}
+.bar.second .fill{background:var(--gold)}
+.bars-note{font-size:12px;color:var(--muted);margin-top:12px}
+
+.signals{list-style:none;display:grid;gap:10px}
+.signals li{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:13px 15px 13px 40px;position:relative;font-size:14.5px;color:var(--ink-2)}
+.signals li::before{content:"";position:absolute;left:16px;top:19px;width:8px;height:8px;background:var(--gold);transform:rotate(45deg)}
+
+.steps{list-style:none;display:grid;gap:12px;counter-reset:s}
+.steps li{counter-increment:s;background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 18px 64px;position:relative}
+.steps li::before{content:counter(s,decimal-leading-zero);position:absolute;left:18px;top:16px;font-family:var(--display);font-weight:900;font-stretch:80%;font-size:28px;line-height:1;color:var(--gold)}
+.steps b{display:block;font-weight:600;color:var(--ink);margin-bottom:4px;font-size:15.5px;line-height:1.35}
+.steps span{color:var(--ink-2);font-size:14.5px}
+
+.callout{background:var(--gold-soft);border-radius:var(--radius);padding:16px 18px;font-size:14.5px;color:#5B4220;margin-top:14px}
+.callout b{color:#3E2C12}
+.limits{background:var(--paper);border:1px dashed #CFCBC1;border-radius:var(--radius);padding:18px}
+.limits p{font-size:15px}
+.direction{font-family:var(--serif);font-size:clamp(22px,5.6vw,27px);line-height:1.25;color:var(--ink);margin-top:6px}
+.direction em{color:var(--gold)}
+
+.thanks{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:26px 22px;text-align:left;margin-top:8px}
+.thanks p{color:var(--ink-2)}
+
+/* CTA */
+.cta{background:var(--dark);color:#fff;border-radius:24px;padding:34px 24px 28px;margin:12px -4px 0;position:relative;overflow:hidden}
+.cta::after{content:"";position:absolute;left:-80px;bottom:-80px;width:220px;height:220px;border:1px solid rgba(193,134,58,.3);border-radius:50%}
+.cta h2{font-stretch:82%;font-size:clamp(34px,9.4vw,52px);text-transform:uppercase;line-height:.92;margin-bottom:20px;position:relative}
+.cta p{color:#C9C6BE;margin-bottom:14px;position:relative}
+.cta .word{display:flex;align-items:center;justify-content:center;margin:22px 0;padding:22px 0;border-top:1px solid #2C2B27;border-bottom:1px solid #2C2B27;position:relative}
+.cta .word span{font-family:var(--display);font-weight:900;font-stretch:80%;font-size:clamp(84px,26vw,128px);line-height:.85;color:var(--gold);letter-spacing:.02em}
+.cta .word small{position:absolute;top:10px;left:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#8F8C83}
+.cta .principle{font-family:var(--serif);font-style:italic;font-size:clamp(24px,6.4vw,32px);line-height:1.18;color:#fff;margin:26px 0 14px;position:relative}
+.cta .hug{color:#fff;margin-bottom:24px}
+.cta .btn{position:relative}
+.cta .ig-note{font-size:12.5px;color:#8F8C83;text-align:center;margin-top:12px;position:relative}
+
+.restart{display:block;margin:30px auto 0;font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.foot{max-width:640px;margin:0 auto;padding:0 20px 34px;font-size:11.5px;color:var(--muted);line-height:1.5}
+
+@media (min-width:640px){
+  main{padding-top:44px}
+  .result-hero,.cta{padding:40px 36px 34px;margin-left:0;margin-right:0}
+  .bar{grid-template-columns:150px 1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<header class="top hidden-bar" id="top">
+  <div class="top-inner">
+    <div class="brand"><i></i>Bastián Almaraz</div>
+    <div class="step-count" id="stepCount"></div>
+  </div>
+  <div class="progress"><span id="bar"></span></div>
+</header>
+
+<main id="app" aria-live="polite"></main>
+
+<footer class="foot">
+  Este cuestionario es una herramienta orientativa de entrenamiento y hábitos. No sustituye una valoración médica ni nutricional.
+</footer>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN
+   WEBHOOK_URL: endpoint que recibe cada diagnóstico completado
+   (Google Apps Script, Make, Zapier, n8n…). Ver README.md.
+   Si se deja vacío, el cuestionario funciona igual pero no se guarda nada.
+   ========================================================= */
+const CONFIG = {
+  WEBHOOK_URL: "",
+  INSTAGRAM_URL: "https://www.instagram.com/bastianalmaraz/",
+  INSTAGRAM_HANDLE: "@bastianalmaraz"
+};
+
+/* ---------------- Variables (categorías) ---------------- */
+const CATS = {
+  A: { key: "A", name: "Alimentación",        art: "la alimentación" },
+  B: { key: "B", name: "Actividad diaria",    art: "tu actividad diaria" },
+  C: { key: "C", name: "Entrenamiento",       art: "el entrenamiento" },
+  D: { key: "D", name: "Recuperación",        art: "tu recuperación y tu sueño" },
+  E: { key: "E", name: "Estructura",          art: "la estructura de tu proceso" }
+};
+// Desempate: el orden en que conviene revisar las variables
+const PRIORITY = ["E", "A", "D", "C", "B"];
+
+/* ---------------- Preguntas ----------------
+   s   = puntos por categoría
+   sig = señal personalizada que se muestra en el resultado
+--------------------------------------------- */
+const QUESTIONS = [
+  {
+    id: "tiempo", kicker: "Tiempo estancado",
+    title: "¿Cuánto tiempo llevas sintiendo que tu peso o tu físico dejaron de cambiar?",
+    options: [
+      { t: "Menos de 2 semanas", s: {} },
+      { t: "2 a 4 semanas", s: { A: 1 } },
+      { t: "1 a 3 meses", s: { A: 1, B: 1, C: 1 }, sig: "Llevas de 1 a 3 meses sin ver cambios claros." },
+      { t: "Más de 3 meses", s: { A: 1, E: 2 }, sig: "Llevas más de 3 meses sintiendo que tu físico no cambia." },
+      { t: "Llevo mucho tiempo entrando y saliendo del proceso", s: { E: 4 }, sig: "Llevas tiempo entrando y saliendo del proceso." }
+    ]
+  },
+  {
+    id: "situacion", kicker: "Qué está pasando realmente",
+    title: "¿Qué describe mejor lo que está pasando actualmente?",
+    options: [
+      { t: "Estoy comiendo mejor, pero mi peso no baja", s: { A: 2, B: 1 }, sig: "Sientes que comes mejor, pero tu peso no baja." },
+      { t: "Bajé al principio y después me estanqué", s: { B: 2, A: 1 }, sig: "Bajaste al principio y después te estancaste." },
+      { t: "Entre semana voy bien, pero el fin de semana pierdo estructura", s: { A: 3, E: 1 }, sig: "Entre semana vas bien, pero el fin de semana pierdes estructura." },
+      { t: "Entreno constantemente, pero no veo cambios", s: { C: 3, A: 1 }, sig: "Entrenas constantemente, pero no ves cambios." },
+      { t: "Mi alimentación y entrenamiento cambian mucho de una semana a otra", s: { E: 3, A: 1 }, sig: "Tu alimentación y tu entrenamiento cambian mucho de una semana a otra." },
+      { t: "No sé exactamente qué estoy haciendo mal", s: { E: 1, A: 1 }, sig: "No tienes claro qué es lo que no está funcionando." }
+    ]
+  },
+  {
+    id: "alimentacion", kicker: "Alimentación",
+    title: "En una semana normal, ¿qué tan consistente eres con tu alimentación?",
+    options: [
+      { t: "Soy bastante consistente casi todos los días", s: {} },
+      { t: "Entre semana soy consistente, pero el fin de semana cambio mucho", s: { A: 3 }, sig: "Tu alimentación cambia mucho el fin de semana." },
+      { t: "Algunas comidas están estructuradas y otras las improviso", s: { A: 2 }, sig: "Parte de tus comidas las improvisas." },
+      { t: "Como diferente prácticamente todos los días", s: { A: 3, E: 1 }, sig: "Comes diferente prácticamente todos los días." },
+      { t: "No tengo una estructura clara", s: { A: 3, E: 2 }, sig: "No tienes una estructura clara de alimentación." }
+    ]
+  },
+  {
+    id: "actividad", kicker: "Actividad",
+    title: "Fuera del entrenamiento, ¿qué tan activo eres durante el día?",
+    help: "Solo es una referencia de tu día a día, no una prueba.",
+    options: [
+      { t: "Paso gran parte del día sentado", s: { B: 3 }, sig: "Pasas gran parte del día sentado." },
+      { t: "Camino bastante durante el día", s: {} },
+      { t: "Mi actividad cambia mucho dependiendo del día", s: { B: 2 }, sig: "Tu actividad diaria cambia mucho de un día a otro." },
+      { t: "Mi trabajo requiere estar constantemente en movimiento", s: {} },
+      { t: "No tengo idea de cuánta actividad hago", s: { B: 2 }, sig: "No tienes claro cuánto te mueves fuera del entrenamiento." }
+    ]
+  },
+  {
+    id: "entrenamiento", kicker: "Entrenamiento",
+    title: "¿Cómo ha sido tu entrenamiento durante las últimas semanas?",
+    options: [
+      { t: "Entreno de forma constante y tengo una estructura clara", s: {} },
+      { t: "Entreno constantemente, pero no sé si estoy progresando", s: { C: 3 }, sig: "Entrenas constante, pero no sabes si estás progresando." },
+      { t: "Entreno cuando tengo tiempo", s: { C: 1, E: 2 }, sig: "Entrenas cuando tienes tiempo." },
+      { t: "Mi entrenamiento cambia constantemente", s: { C: 3 }, sig: "Tu entrenamiento cambia constantemente." },
+      { t: "He faltado varias sesiones", s: { C: 1, E: 2 }, sig: "Has faltado a varias sesiones." },
+      { t: "Actualmente no tengo una estructura de entrenamiento", s: { C: 3, E: 1 }, sig: "No tienes una estructura de entrenamiento definida." }
+    ]
+  },
+  {
+    id: "sueno", kicker: "Recuperación",
+    title: "¿Cómo estás durmiendo normalmente?",
+    help: "No es un diagnóstico médico; solo queremos entender tu recuperación.",
+    options: [
+      { t: "7-8 horas y bastante bien", s: {} },
+      { t: "6-7 horas", s: { D: 1 } },
+      { t: "Menos de 6 horas", s: { D: 4 }, sig: "Duermes menos de 6 horas." },
+      { t: "Mi horario cambia mucho", s: { D: 3, E: 1 }, sig: "Tu horario de sueño cambia mucho." },
+      { t: "Duermo suficiente, pero no descanso bien", s: { D: 3 }, sig: "Duermes suficiente, pero sientes que no descansas bien." },
+      { t: "Depende mucho de la semana", s: { D: 2, E: 1 }, sig: "Tu sueño depende mucho de cómo venga la semana." }
+    ]
+  },
+  {
+    id: "trabajo", kicker: "Tu contexto",
+    title: "¿A qué te dedicas y cómo es normalmente tu jornada de trabajo?",
+    openText: true,
+    options: [
+      { t: "Trabajo principalmente sentado", s: { B: 2 }, sig: "Tu trabajo es principalmente sentado." },
+      { t: "Trabajo principalmente de pie o en movimiento", s: {} },
+      { t: "Trabajo muchas horas frente a computadora", s: { B: 2, D: 1 }, sig: "Pasas muchas horas frente a la computadora." },
+      { t: "Mi horario cambia constantemente", s: { E: 2, D: 1 }, sig: "Tu horario de trabajo cambia constantemente." },
+      { t: "Trabajo por turnos", s: { D: 2, E: 2 }, sig: "Trabajas por turnos." },
+      { t: "Otro", s: {} }
+    ]
+  },
+  {
+    id: "compromisos", kicker: "Trabajo, viajes y compromisos",
+    title: "¿Con qué frecuencia tu trabajo, viajes o compromisos hacen difícil mantener tu entrenamiento y alimentación?",
+    options: [
+      { t: "Casi nunca", s: {} },
+      { t: "Algunas veces al mes", s: { E: 1 } },
+      { t: "Varias veces por semana", s: { E: 3 }, sig: "Varias veces por semana tus compromisos te sacan del plan." },
+      { t: "Prácticamente todas las semanas", s: { E: 4 }, sig: "Prácticamente todas las semanas tu contexto te complica mantener el plan." }
+    ]
+  },
+  {
+    id: "intentos", kicker: "Lo que ya intentaste",
+    title: "¿Qué has intentado para salir del estancamiento?",
+    multi: true,
+    options: [
+      { t: "Contar calorías", s: {} },
+      { t: "Usar una aplicación", s: {} },
+      { t: "Seguir una dieta", s: { A: 1 } },
+      { t: "Cambiar mi entrenamiento", s: { C: 1 } },
+      { t: "Hacer más cardio", s: { B: 1, C: 1 }, sig: "Para salir del estancamiento, hiciste más cardio." },
+      { t: "Entrenar más días", s: { C: 2, D: 1 }, sig: "Para salir del estancamiento, entrenaste más días." },
+      { t: "Trabajar con un coach", s: { E: 1 } },
+      { t: "Reducir mucho la comida", s: { A: 2, D: 1 }, sig: "Redujiste mucho la comida." },
+      { t: "Simplemente esperar y seguir haciendo lo mismo", s: { C: 1 } }
+    ]
+  },
+  {
+    id: "objetivo", kicker: "Tu objetivo",
+    title: "¿Qué es lo que más quieres conseguir ahora?",
+    options: [
+      { t: "Perder grasa", s: {} },
+      { t: "Perder grasa y ganar músculo", s: { C: 1 } },
+      { t: "Volver a verme como antes", s: {} },
+      { t: "Sentirme mejor con mi físico", s: {} },
+      { t: "Dejar de estar empezando constantemente", s: { E: 2 }, sig: "Quieres dejar de empezar constantemente." },
+      { t: "Tener una estructura que pueda mantener", s: { E: 1 } }
+    ]
+  }
+];
+
+/* ---------------- Resultados ---------------- */
+const RESULTS = {
+  A: {
+    title: "Alimen&shy;tación",
+    headline: "Tu principal cuello de botella parece estar en la alimentación.",
+    meaning: [
+      "Esto <strong>no significa necesariamente que estés comiendo “mal” ni demasiado.</strong> Puede significar que existe una diferencia importante entre lo que haces durante algunos días y lo que ocurre durante el resto de la semana, o que tu alimentación todavía no tiene suficiente estructura para que el progreso sea predecible."
+    ],
+    why: [
+      "Antes de hacer un ajuste, tenemos que entender cómo se ve tu semana completa. Si de lunes a jueves vas muy bien y de viernes a domingo cambia todo, el balance de la semana puede quedar muy cerca de lo que tu cuerpo necesita para mantenerse, no para bajar.",
+      "Lo mismo pasa cuando cada día improvisas: no es que te falten ganas, es que sin una base estable es muy difícil saber qué está funcionando y qué no."
+    ],
+    steps: [
+      ["Identifica las comidas que más se repiten.", "Durante una semana, anota qué desayunas, comes y cenas normalmente. No para contar todo, sino para ver cuál es tu base real."],
+      ["Detecta dónde se rompe la estructura.", "¿El fin de semana, las cenas, las comidas fuera, los días de más trabajo? Casi siempre hay un patrón que se repite."],
+      ["Mantén una estructura básica la mayor parte de la semana.", "Antes de buscar el plan perfecto, busca uno que puedas repetir. Pocas comidas base bien resueltas valen más que un menú ideal que dura tres días."]
+    ],
+    limits: "Lo que todavía no podemos determinar con este cuestionario es cuánto deberías comer, qué distribución necesitas o cuándo tendría sentido modificarla."
+  },
+  B: {
+    title: "Actividad diaria",
+    headline: "Tu principal variable a revisar podría ser tu actividad diaria.",
+    meaning: [
+      "Esto <strong>no necesariamente significa que te falte entrenar más.</strong> Entrenar algunas veces por semana no significa que el resto del día tenga el mismo nivel de actividad."
+    ],
+    why: [
+      "Una sesión de entrenamiento dura alrededor de una hora; el resto del día son otras quince o dieciséis horas despierto. Si gran parte de ese tiempo lo pasas sentado, o si tu movimiento fue bajando sin que lo notaras, eso puede pesar más de lo que parece en lo que gastas cada día.",
+      "Muchas veces el estancamiento no viene del gimnasio, sino de todo lo que pasa fuera de él."
+    ],
+    steps: [
+      ["Observa cuánto te mueves realmente durante el día.", "Si tu celular o tu reloj cuentan pasos, revisa tu promedio de las últimas semanas. No como meta, sino como referencia."],
+      ["Identifica los días en los que prácticamente no sales de la silla.", "Suelen ser los días de más trabajo o más estrés. Ahí es donde más vale la pena poner atención."],
+      ["Evita asumir que más cardio siempre es la solución.", "Agregar sesiones de cardio sin revisar el resto del día puede aumentar el cansancio y el hambre, y terminar compensándose solo."]
+    ],
+    limits: "Lo que todavía no podemos determinar con este cuestionario es cuánta actividad necesitas en tu caso, cómo integrarla con tu entrenamiento y tu alimentación, ni cuándo tendría sentido aumentarla."
+  },
+  C: {
+    title: "Entrena&shy;miento",
+    headline: "Tu principal variable a revisar podría ser el entrenamiento.",
+    meaning: [
+      "Esto <strong>no necesariamente significa que entrenes poco.</strong> Entrenar más no necesariamente significa progresar más."
+    ],
+    why: [
+      "Para que el entrenamiento ayude a cambiar tu físico —sobre todo mientras pierdes grasa— tiene que darle a tu cuerpo una razón para conservar y construir músculo. Eso depende de la progresión: hacer un poco mejor, con el tiempo, los mismos ejercicios.",
+      "Cuando la rutina cambia constantemente, faltan sesiones o no hay registro, es muy difícil saber si estás progresando o simplemente acumulando sesiones."
+    ],
+    steps: [
+      ["Mantén una estructura estable durante varias semanas.", "Los mismos ejercicios principales, los mismos días. Sin estabilidad no hay forma de medir si algo funciona."],
+      ["Registra el rendimiento de tus ejercicios principales.", "Peso y repeticiones de 3 o 4 ejercicios clave. Con eso basta para empezar."],
+      ["Revisa si realmente existe progresión.", "Compara tus registros cada 2 o 3 semanas: ¿estás mejorando o solo estás acumulando sesiones?"]
+    ],
+    limits: "Lo que todavía no podemos determinar con este cuestionario es qué volumen, qué frecuencia o qué ejercicios necesitas tú, ni cómo ajustar el entrenamiento según tu recuperación y tu progreso."
+  },
+  D: {
+    title: "Recupe&shy;ración",
+    headline: "Tu recuperación podría estar limitando tu proceso.",
+    meaning: [
+      "Esto <strong>no es un diagnóstico médico ni significa que tengas un problema de sueño.</strong> Significa que, antes de seguir aumentando el entrenamiento o reduciendo la comida, conviene revisar cómo estás durmiendo y cómo te estás recuperando."
+    ],
+    why: [
+      "Cuando duermes poco o con horarios muy irregulares, es común que el hambre y los antojos sean más difíciles de manejar, que rindas menos en tus sesiones y que te muevas menos durante el día sin darte cuenta.",
+      "Ninguna de estas cosas aparece de inmediato en la báscula, pero en conjunto pueden frenar un proceso que en papel debería estar funcionando."
+    ],
+    steps: [
+      ["Haz tu horario lo más regular posible.", "Acostarte y levantarte a horas parecidas, incluso el fin de semana, suele ayudar más que intentar “recuperar” sueño."],
+      ["Prioriza el sueño como parte del plan.", "No como algo que queda si sobra tiempo. Si hoy duermes menos de 6 horas, ganar aunque sea 30 o 45 minutos ya es un avance."],
+      ["Observa cómo llegas a tus sesiones.", "Califica del 1 al 10 tu energía al entrenar. Si casi siempre llegas cansado, es una señal que vale la pena tomar en cuenta antes de entrenar más."]
+    ],
+    note: "Si el cansancio es constante o sientes que no descansas aunque duermas suficientes horas, vale la pena comentarlo con un médico.",
+    limits: "Lo que todavía no podemos determinar con este cuestionario es cuánto está influyendo realmente tu recuperación, cómo ajustar entrenamiento y alimentación mientras la mejoras, ni cuándo tiene sentido apretar y cuándo no."
+  },
+  E: {
+    title: "Estruc&shy;tura",
+    headline: "Tu principal cuello de botella parece ser la estructura.",
+    meaning: [
+      "Esto <strong>no necesariamente significa que te falte disciplina.</strong> Puede significar que estás intentando seguir un protocolo que no fue diseñado alrededor de tu vida."
+    ],
+    why: [
+      "Tu contexto importa. Cuando el trabajo, los viajes o los compromisos cambian tu semana constantemente, un plan rígido se rompe al primer imprevisto. Y cuando se rompe, es fácil sentir que “ya se perdió la semana” y volver a empezar el lunes.",
+      "Ese ciclo de empezar y dejar, más que cualquier variable aislada, suele ser lo que más frena el progreso a largo plazo."
+    ],
+    steps: [
+      ["Define días y horarios reales de entrenamiento.", "No los ideales: los que de verdad puedes cumplir con tu agenda actual."],
+      ["Crea un Plan B para los días complicados.", "Una sesión corta, un entrenamiento en casa o en hotel. Algo que puedas hacer cuando el plan original no se puede."],
+      ["Identifica comidas base y alternativas para comer fuera.", "Saber qué pedir en un restaurante, en un aeropuerto o en una comida de trabajo te quita decisiones en el peor momento."],
+      ["Deja de considerar una sesión perdida como una semana perdida.", "Una sesión que no se hizo es solo eso. Lo que pesa es lo que pasa en la mayoría de las semanas."]
+    ],
+    limits: "Lo que todavía no podemos determinar con este cuestionario es qué estructura tiene sentido para tu agenda real, cuánto margen de flexibilidad puedes tener sin frenar tu progreso, ni cómo ajustar el protocolo cuando tu semana cambia."
+  }
+};
+
+/* ---------------- Estado ---------------- */
+const state = {
+  step: -1,               // -1 portada · 0..9 preguntas · 10 perfil · 11 instagram · 12 resultado
+  answers: {},            // id -> índice (o array de índices si es múltiple)
+  trabajoTexto: "",
+  edad: null,
+  sexo: null,
+  instagram: ""
+};
+const PROFILE_STEP = QUESTIONS.length;
+const IG_STEP = QUESTIONS.length + 1;
+const TOTAL_STEPS = QUESTIONS.length + 2;
+
+const app = document.getElementById("app");
+const bar = document.getElementById("bar");
+const stepCount = document.getElementById("stepCount");
+const topEl = document.getElementById("top");
+
+const ICON_ARROW = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+const ICON_BACK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>';
+const ICON_CHECK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* ---------------- Navegación ---------------- */
+function go(step) {
+  const current = app.firstElementChild;
+  const render = () => {
+    state.step = step;
+    updateChrome();
+    if (step < 0) renderCover();
+    else if (step < QUESTIONS.length) renderQuestion(QUESTIONS[step], step);
+    else if (step === PROFILE_STEP) renderProfile();
+    else if (step === IG_STEP) renderInstagram();
+    window.scrollTo(0, 0);
+  };
+  if (current) {
+    current.classList.add("leaving");
+    setTimeout(render, 200);
+  } else render();
+}
+
+function updateChrome() {
+  const s = state.step;
+  const inQuiz = s >= 0 && s < TOTAL_STEPS;
+  topEl.classList.toggle("hidden-bar", !inQuiz);
+  if (inQuiz) {
+    bar.style.width = ((s + 1) / TOTAL_STEPS * 100) + "%";
+    stepCount.textContent = String(s + 1).padStart(2, "0") + " / " + String(TOTAL_STEPS).padStart(2, "0");
+  } else {
+    bar.style.width = s >= TOTAL_STEPS ? "100%" : "0";
+    stepCount.textContent = "";
+  }
+}
+
+function backButton() {
+  return `<button class="back" type="button" data-back>${ICON_BACK} Anterior</button>`;
+}
+function bindBack(el) {
+  const b = el.querySelector("[data-back]");
+  if (b) b.addEventListener("click", () => go(state.step - 1));
+}
+
+/* ---------------- Portada ---------------- */
+function renderCover() {
+  app.innerHTML = `
+  <section class="screen cover">
+    <div class="cover-tag"><b></b>Diagnóstico gratuito</div>
+    <h1>¿Por qué dejaste de <em>bajar?</em></h1>
+    <p class="sub">Descubre en 3 minutos qué puede estar frenando tu progreso y qué variable deberías revisar primero.</p>
+    <div class="meta">
+      <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>3 minutos</span>
+      <span><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>10 preguntas</span>
+      <span><svg viewBox="0 0 24 24"><path d="M12 3l2.5 5.5L20 9.5l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-1z"/></svg>Resultado al instante</span>
+    </div>
+    <div>
+      <button class="btn" type="button" id="start">Empezar diagnóstico ${ICON_ARROW}</button>
+      <p class="fineprint">Responde con honestidad. No hay respuestas buenas o malas.</p>
+    </div>
+    <div class="signature">
+      <div class="mono">BA</div>
+      <p><b>Bastián Almaraz</b>Entrenador especializado en transformación física de hombres adultos.</p>
+    </div>
+  </section>`;
+  app.querySelector("#start").addEventListener("click", () => go(0));
+}
+
+/* ---------------- Pregunta ---------------- */
+function renderQuestion(q, idx) {
+  const sel = state.answers[q.id];
+  const isSel = i => q.multi ? (sel || []).includes(i) : sel === i;
+  const needsButton = q.multi || q.openText;
+
+  app.innerHTML = `
+  <section class="screen">
+    ${backButton()}
+    <div class="kicker">${String(idx + 1).padStart(2, "0")} · ${esc(q.kicker)}</div>
+    <h2 class="q-title">${esc(q.title)}</h2>
+    ${q.help ? `<p class="q-help">${esc(q.help)}</p>` : `<div style="height:14px"></div>`}
+    ${q.multi ? `<p class="hint-multi">Puedes elegir varias.</p>` : ""}
+    <div class="options" role="${q.multi ? "group" : "radiogroup"}">
+      ${q.options.map((o, i) => `
+        <button type="button" class="opt ${q.multi ? "multi" : ""}" data-i="${i}" aria-pressed="${isSel(i)}">
+          <span class="mark">${ICON_CHECK}</span>
+          <span>${esc(o.t)}</span>
+        </button>`).join("")}
+    </div>
+    ${q.openText ? `
+      <label class="field-label" for="openText">Si quieres, cuéntame un poco más de tu trabajo y tu jornada <span style="color:var(--muted)">(opcional)</span></label>
+      <textarea class="textarea" id="openText" maxlength="400" placeholder="Ej. Soy ingeniero, trabajo de 9 a 7 en oficina y viajo dos veces al mes.">${esc(state.trabajoTexto)}</textarea>` : ""}
+    ${needsButton ? `<div class="actions"><button class="btn" type="button" id="next" ${hasAnswer(q) ? "" : "disabled"}>Continuar ${ICON_ARROW}</button></div>` : ""}
+  </section>`;
+
+  const el = app.firstElementChild;
+  bindBack(el);
+  const nextBtn = el.querySelector("#next");
+
+  el.querySelectorAll(".opt").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const i = +btn.dataset.i;
+      if (q.multi) {
+        const arr = new Set(state.answers[q.id] || []);
+        arr.has(i) ? arr.delete(i) : arr.add(i);
+        state.answers[q.id] = [...arr].sort((a, b) => a - b);
+        btn.setAttribute("aria-pressed", arr.has(i));
+      } else {
+        state.answers[q.id] = i;
+        el.querySelectorAll(".opt").forEach(b => b.setAttribute("aria-pressed", b === btn));
+        if (!needsButton) setTimeout(() => go(idx + 1), 260);
+      }
+      if (nextBtn) nextBtn.disabled = !hasAnswer(q);
+    });
+  });
+
+  const ta = el.querySelector("#openText");
+  if (ta) ta.addEventListener("input", () => { state.trabajoTexto = ta.value; });
+  if (nextBtn) nextBtn.addEventListener("click", () => go(idx + 1));
+}
+
+function hasAnswer(q) {
+  const a = state.answers[q.id];
+  return q.multi ? Array.isArray(a) && a.length > 0 : a !== undefined;
+}
+
+/* ---------------- Perfil (edad / sexo) ---------------- */
+const EDADES = ["Menos de 27", "27 a 35", "36 a 45", "Más de 45"];
+const SEXOS = ["Hombre", "Mujer"];
+
+function renderProfile() {
+  app.innerHTML = `
+  <section class="screen">
+    ${backButton()}
+    <div class="kicker">${String(PROFILE_STEP + 1).padStart(2, "0")} · Sobre ti</div>
+    <h2 class="q-title">Dos datos rápidos para afinar tu resultado.</h2>
+    <p class="q-help">Tu contexto importa: no se revisa igual un proceso a los 25 que a los 40.</p>
+    <div class="group-title">Edad</div>
+    <div class="chips" data-group="edad">
+      ${EDADES.map((t, i) => `<button type="button" class="opt" data-i="${i}" aria-pressed="${state.edad === i}"><span class="mark"></span><span>${t}</span></button>`).join("")}
+    </div>
+    <div class="group-title">Sexo</div>
+    <div class="chips" data-group="sexo">
+      ${SEXOS.map((t, i) => `<button type="button" class="opt" data-i="${i}" aria-pressed="${state.sexo === i}"><span class="mark"></span><span>${t}</span></button>`).join("")}
+    </div>
+    <div class="actions"><button class="btn" type="button" id="next" ${state.edad !== null && state.sexo !== null ? "" : "disabled"}>Continuar ${ICON_ARROW}</button></div>
+  </section>`;
+  const el = app.firstElementChild;
+  bindBack(el);
+  const nextBtn = el.querySelector("#next");
+  el.querySelectorAll("[data-group]").forEach(group => {
+    const key = group.dataset.group;
+    group.querySelectorAll(".opt").forEach(btn => btn.addEventListener("click", () => {
+      state[key] = +btn.dataset.i;
+      group.querySelectorAll(".opt").forEach(b => b.setAttribute("aria-pressed", b === btn));
+      nextBtn.disabled = !(state.edad !== null && state.sexo !== null);
+    }));
+  });
+  nextBtn.addEventListener("click", () => go(IG_STEP));
+}
+
+/* ---------------- Instagram ---------------- */
+function renderInstagram() {
+  app.innerHTML = `
+  <section class="screen">
+    ${backButton()}
+    <div class="gate-card">
+      <div class="kicker">Último paso</div>
+      <h2>Tu diagnóstico está listo.</h2>
+      <p>Escribe tu usuario de Instagram para ver tu resultado. Así, si decides escribirle a Bastián, ya sabe de qué estamos hablando.</p>
+    </div>
+    <label class="field-label" for="ig" style="margin-top:0">Tu usuario de Instagram</label>
+    <div class="ig-wrap"><span>@</span><input class="input" id="ig" type="text" inputmode="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="31" placeholder="tuusuario" value="${esc(state.instagram)}"></div>
+    <div class="error" id="igErr" role="alert"></div>
+    <div class="actions" style="margin-top:12px"><button class="btn gold" type="button" id="see">Ver mi resultado ${ICON_ARROW}</button></div>
+    <p class="privacy"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Solo lo usamos para identificar tu diagnóstico. No publicamos nada ni lo compartimos con nadie.</p>
+  </section>`;
+  const el = app.firstElementChild;
+  bindBack(el);
+  const input = el.querySelector("#ig");
+  const err = el.querySelector("#igErr");
+  const submit = () => {
+    const v = input.value.trim().replace(/^@+/, "").replace(/^https?:\/\/(www\.)?instagram\.com\//i, "").replace(/\/.*$/, "");
+    if (!/^[A-Za-z0-9._]{1,30}$/.test(v)) {
+      err.textContent = "Escribe un usuario válido (solo letras, números, puntos y guiones bajos).";
+      input.focus();
+      return;
+    }
+    err.textContent = "";
+    state.instagram = v;
+    input.blur();
+    finish();
+  };
+  el.querySelector("#see").addEventListener("click", submit);
+  input.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+  input.addEventListener("input", () => { err.textContent = ""; });
+}
+
+/* ---------------- Cálculo ---------------- */
+function compute() {
+  const scores = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+  const signals = { A: [], B: [], C: [], D: [], E: [] };
+
+  QUESTIONS.forEach(q => {
+    const a = state.answers[q.id];
+    const picked = q.multi ? (a || []) : (a === undefined ? [] : [a]);
+    picked.forEach(i => {
+      const o = q.options[i];
+      Object.entries(o.s).forEach(([k, v]) => {
+        scores[k] += v;
+        if (o.sig && v >= 2) signals[k].push(o.sig);
+      });
+    });
+  });
+
+  const ranked = Object.keys(scores).sort((x, y) => (scores[y] - scores[x]) || (PRIORITY.indexOf(x) - PRIORITY.indexOf(y)));
+  let main = ranked[0];
+  if (scores[main] === 0) main = "E";
+  const second = ranked.find(k => k !== main && scores[k] > 0) || null;
+  return { scores, signals, main, second };
+}
+
+function evaluateICP() {
+  const male = state.sexo === 0;
+  const inAge = state.edad === 1 || state.edad === 2;
+  const intentos = state.answers.intentos || [];
+  const triedSomething = intentos.some(i => i !== 8);
+  const tiempo = state.answers.tiempo;
+  const struggling = tiempo !== undefined && tiempo >= 1;
+  return {
+    fit: male && inAge && (triedSomething || struggling),
+    male, inAge, triedSomething, struggling
+  };
+}
+
+function finish() {
+  const res = compute();
+  const icp = evaluateICP();
+  sendLead(res, icp);
+  renderLoader(() => renderResult(res, icp));
+}
+
+/* ---------------- Envío ---------------- */
+function sendLead(res, icp) {
+  if (!CONFIG.WEBHOOK_URL) return;
+  const respuestas = {};
+  QUESTIONS.forEach(q => {
+    const a = state.answers[q.id];
+    respuestas[q.id] = q.multi ? (a || []).map(i => q.options[i].t).join(" | ") : (a !== undefined ? q.options[a].t : "");
+  });
+  const params = new URLSearchParams(location.search);
+  const payload = {
+    fecha: new Date().toISOString(),
+    instagram: "@" + state.instagram,
+    edad: EDADES[state.edad],
+    sexo: SEXOS[state.sexo],
+    resultado: CATS[res.main].name,
+    segunda_variable: res.second ? CATS[res.second].name : "",
+    puntajes: res.scores,
+    perfil_ideal: icp.fit ? "Sí" : "No",
+    ...respuestas,
+    trabajo_detalle: state.trabajoTexto.trim(),
+    utm_source: params.get("utm_source") || "",
+    utm_medium: params.get("utm_medium") || "",
+    utm_campaign: params.get("utm_campaign") || ""
+  };
+  try {
+    fetch(CONFIG.WEBHOOK_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload),
+      keepalive: true
+    }).catch(() => {});
+  } catch (e) {}
+}
+
+/* ---------------- Loader ---------------- */
+function renderLoader(done) {
+  state.step = TOTAL_STEPS;
+  updateChrome();
+  const items = ["Revisando tu alimentación", "Revisando tu actividad y entrenamiento", "Revisando tu recuperación", "Revisando tu contexto"];
+  app.innerHTML = `
+  <section class="screen loader">
+    <div class="kicker">Analizando tus respuestas</div>
+    <h2>Antes de proponer, hay que diagnosticar.</h2>
+    <ul>${items.map(t => `<li><i></i>${t}</li>`).join("")}</ul>
+  </section>`;
+  window.scrollTo(0, 0);
+  const lis = app.querySelectorAll("li");
+  lis.forEach((li, i) => {
+    setTimeout(() => li.classList.add("on"), 120 + i * 420);
+    setTimeout(() => li.classList.add("done"), 420 + i * 420);
+  });
+  setTimeout(() => {
+    app.firstElementChild.classList.add("leaving");
+    setTimeout(done, 200);
+  }, 420 + lis.length * 420 + 200);
+}
+
+/* ---------------- Resultado ---------------- */
+function renderResult(res, icp) {
+  const R = RESULTS[res.main];
+  const cat = CATS[res.main];
+  const max = Math.max(1, ...Object.values(res.scores));
+  const order = ["A", "B", "C", "D", "E"];
+  const signals = [...new Set(res.signals[res.main])].slice(0, 4);
+  const recent = state.answers.tiempo === 0;
+  const reducedFood = (state.answers.intentos || []).includes(7);
+
+  const why = [...R.why];
+  if (res.main === "A" && reducedFood) why.push("Y si en algún momento recortaste mucho la comida, es común que el hambre y el cansancio terminen empujando justo hacia esos días donde se pierde la estructura.");
+  if (res.main === "C" && (state.answers.intentos || []).includes(5)) why.push("Agregar días de entrenamiento sin una estrategia clara suele sumar cansancio antes que resultados.");
+  if (res.main === "B" && (state.answers.intentos || []).includes(4)) why.push("Ya intentaste hacer más cardio; por eso vale la pena mirar primero el movimiento del resto del día, no solo lo que pasa en la sesión.");
+
+  app.innerHTML = `
+  <section class="screen">
+    <div class="result-hero">
+      <div class="kicker">Tu diagnóstico</div>
+      <div class="handle">@${esc(state.instagram)}</div>
+      <p class="lead">Por tus respuestas, parece que la variable que más vale la pena revisar primero es <b>${cat.art}</b>.</p>
+      <h1>${R.title}<em>.</em></h1>
+      <p class="headline">“${R.headline}”</p>
+    </div>
+
+    <div class="block">
+      <h3>Mapa de variables <small>Referencia orientativa</small></h3>
+      <div class="bars">
+        ${order.map(k => `
+          <div class="bar ${k === res.main ? "top" : k === res.second ? "second" : ""}">
+            <span class="lbl">${CATS[k].name}</span>
+            <div class="track"><div class="fill" data-w="${Math.round(Math.max(6, res.scores[k] / max * 100))}"></div></div>
+          </div>`).join("")}
+      </div>
+      <p class="bars-note">Muestra qué tantas señales encontramos en tus respuestas para cada variable. No es una medición ni un diagnóstico médico.</p>
+    </div>
+
+    ${signals.length ? `
+    <div class="block">
+      <h3>Lo que vimos en tus respuestas</h3>
+      <ul class="signals">${signals.map(s => `<li>${esc(s)}</li>`).join("")}</ul>
+    </div>` : ""}
+
+    <div class="block">
+      <h3>Qué significa (y qué no)</h3>
+      ${R.meaning.map(p => `<p>${p}</p>`).join("")}
+    </div>
+
+    <div class="block">
+      <h3>Por qué puede estar frenándote</h3>
+      ${why.map(p => `<p>${p}</p>`).join("")}
+      ${recent ? `<div class="callout"><b>Un detalle importante:</b> llevas menos de dos semanas sin ver cambios. Es un periodo corto, y el peso puede variar de un día a otro por agua, sal, digestión o estrés. Esto no significa que el proceso no esté funcionando; antes de hacer un ajuste, vale la pena observar la tendencia de varias semanas.</div>` : ""}
+    </div>
+
+    <div class="block">
+      <h3>Lo primero que puedes empezar a observar</h3>
+      <ol class="steps">${R.steps.map(([b, s]) => `<li><b>${b}</b><span>${s}</span></li>`).join("")}</ol>
+      ${R.note ? `<div class="callout">${R.note}</div>` : ""}
+    </div>
+
+    ${res.second ? `
+    <div class="block">
+      <h3>Una segunda variable</h3>
+      <p>Hay otra variable que también vale la pena revisar después: <strong>${CATS[res.second].art}</strong>. Normalmente estas variables no están aisladas; una suele afectar a la otra.</p>
+    </div>` : ""}
+
+    <div class="block">
+      <h3>Lo que este diagnóstico no puede determinar</h3>
+      <div class="limits"><p>${R.limits}</p></div>
+      <p class="direction" style="margin-top:22px">Ya tienes una primera dirección. Lo que este diagnóstico no puede determinar es <em>cuánto deberías cambiar, cuándo hacerlo y cómo ajustar el protocolo</em> según tu progreso.</p>
+    </div>
+
+    ${icp.fit ? renderCTA() : `
+    <div class="thanks">
+      <p>Gracias por completar el diagnóstico. Ya tienes una primera idea de qué variable vale la pena revisar.</p>
+    </div>`}
+
+    <button class="restart" type="button" id="restart">Volver a hacer el diagnóstico</button>
+  </section>`;
+
+  window.scrollTo(0, 0);
+  requestAnimationFrame(() => setTimeout(() => {
+    app.querySelectorAll(".fill").forEach(f => f.style.width = f.dataset.w + "%");
+  }, 150));
+  app.querySelector("#restart").addEventListener("click", () => {
+    Object.assign(state, { answers: {}, trabajoTexto: "", edad: null, sexo: null, instagram: "" });
+    go(-1);
+  });
+}
+
+function renderCTA() {
+  return `
+  <div class="cta">
+    <div class="kicker">Siguiente paso</div>
+    <h2>¿Quieres saber cómo se vería esto en tu caso?</h2>
+    <p>Si tienes entre 27 y 45 años, ya has intentado cambiar tu físico varias veces y sientes que lo que te ha faltado no son ganas, sino una estructura que realmente puedas mantener…</p>
+    <p>Escríbeme un mensaje privado a mi Instagram <strong style="color:#fff">${CONFIG.INSTAGRAM_HANDLE}</strong> la palabra:</p>
+    <div class="word"><small>Mándame por DM</small><span>“YO”</span></div>
+    <p>Así me pongo en contacto contigo y te explico cómo trabajo.</p>
+    <p>Vamos a revisar tu situación, lo que has intentado y qué está haciendo que no puedas mantener el proceso.</p>
+    <p>Y si tiene sentido para ti, te explico cómo podemos trabajar tu entrenamiento, alimentación y ajustes de acuerdo con tu vida y con el físico que quieres conseguir.</p>
+    <p class="principle">“Primero hay que entender el problema. Después construimos el protocolo.”</p>
+    <p class="hug">Les mando un fuerte abrazo.</p>
+    <a class="btn gold" href="${CONFIG.INSTAGRAM_URL}" target="_blank" rel="noopener">Ir al Instagram de Bastián ${ICON_ARROW}</a>
+    <p class="ig-note">Se abre ${CONFIG.INSTAGRAM_HANDLE} · escríbele “YO” por mensaje directo</p>
+  </div>`;
+}
+
+go(-1);
+</script>
+</body>
+</html>
